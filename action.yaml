@@ -2,6 +2,9 @@ name: CodeArtifact Authentication
 description: Authenticate with CodeArtifact and configure package manager credentials
 
 inputs:
+  credentials:
+    description: AWS credentials
+    required: true
   domain:
     description: CodeArtifact domain
     default: thbx
@@ -28,9 +31,8 @@ runs:
   steps:
     - shell: bash
       run: |
-        CREDENTIALS="${{ secrets.AWS_CODEARTIFACT_USER_API_KEY }}"
-        AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | cut -d' ' -f1) \
-        AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | cut -d' ' -f2) \
+        AWS_ACCESS_KEY_ID=$(echo ${{ inputs.credentials }} | cut -d' ' -f1) \
+        AWS_SECRET_ACCESS_KEY=$(echo ${{ inputs.credentials }} | cut -d' ' -f2) \
         aws codeartifact login \
           --tool ${{ inputs.tool }} \
           --domain ${{ inputs.domain }} \
