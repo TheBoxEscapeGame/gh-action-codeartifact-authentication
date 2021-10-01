@@ -1,0 +1,39 @@
+name: CodeArtifact Authentication
+description: Authenticate with CodeArtifact and configure package manager credentials
+
+inputs:
+  domain:
+    description: CodeArtifact domain
+    default: thbx
+    required: false
+  domainOwner:
+    description: CodeArtifact domain owner (AWS account ID)
+    default: "703373575985"
+    required: false
+  repository:
+    description: Name of the CodeArtifact repository
+    default: pulumi
+    required: false
+  region:
+    description: AWS region
+    default: eu-west-1
+    required: false
+  tool:
+    description: Package manager
+    default: npm
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        CREDENTIALS="${{ secrets.AWS_CODEARTIFACT_USER_API_KEY }}"
+        AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | cut -d' ' -f1) \
+        AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | cut -d' ' -f2) \
+        aws codeartifact login \
+          --tool ${{ inputs.tool }} \
+          --domain ${{ inputs.domain }} \
+          --domain-owner ${{ inputs.domainOwner }} \
+          --repository ${{ inputs.repository }} \
+          --region ${{ inputs.region }}
